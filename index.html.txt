@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Package Tracking System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Arial, sans-serif;
+        }
+        body {
+            background: #f0f4f8;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            max-width: 600px;
+            width: 100%;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 8px 40px rgba(0,0,0,0.08);
+        }
+        .logo {
+            font-size: 28px;
+            font-weight: 700;
+            color: #1a1a2e;
+            margin-bottom: 8px;
+        }
+        .logo span {
+            color: #0066cc;
+        }
+        .subtitle {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 30px;
+        }
+        .field-group {
+            margin-bottom: 18px;
+        }
+        .field-group label {
+            display: block;
+            font-weight: 600;
+            font-size: 14px;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        .field-group input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: 0.2s;
+        }
+        .field-group input:focus {
+            border-color: #0066cc;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(0,102,204,0.12);
+        }
+        .btn {
+            width: 100%;
+            padding: 14px;
+            background: #0066cc;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .btn:hover {
+            background: #004d99;
+        }
+        .btn-secondary {
+            background: transparent;
+            color: #0066cc;
+            border: 2px solid #0066cc;
+            margin-top: 10px;
+        }
+        .btn-secondary:hover {
+            background: #0066cc;
+            color: white;
+        }
+        .result-box {
+            margin-top: 24px;
+            padding: 20px;
+            background: #f8fafc;
+            border-radius: 8px;
+            border-left: 4px solid #0066cc;
+            display: none;
+        }
+        .result-box h3 {
+            color: #1a1a2e;
+            margin-bottom: 8px;
+        }
+        .result-box p {
+            color: #555;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 4px 14px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            margin-top: 8px;
+        }
+        .status-in-transit {
+            background: #fff3cd;
+            color: #856404;
+        }
+        .status-delivered {
+            background: #d4edda;
+            color: #155724;
+        }
+        .status-pending {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        .admin-panel {
+            display: none;
+            margin-top: 30px;
+            padding: 24px;
+            background: #f8fafc;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+        }
+        .admin-panel h3 {
+            margin-bottom: 16px;
+            color: #1a1a2e;
+        }
+        .admin-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 12px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .admin-row input {
+            flex: 1;
+            padding: 10px 14px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            min-width: 120px;
+        }
+        .admin-row select {
+            padding: 10px 14px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            background: white;
+        }
+        .admin-row .btn-small {
+            padding: 10px 18px;
+            background: #0066cc;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 13px;
+        }
+        .admin-row .btn-danger {
+            background: #dc3545;
+        }
+        .tracking-list {
+            margin-top: 16px;
+        }
+        .tracking-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 14px;
+            background: white;
+            border-radius: 6px;
+            margin-bottom: 6px;
+            border: 1px solid #e2e8f0;
+        }
+        .tracking-item .id {
+            font-weight: 600;
+            color: #1a1a2e;
+        }
+        .tracking-item .status-text {
+            font-size: 13px;
+            padding: 2px 12px;
+            border-radius: 12px;
+            background: #e2e8f0;
+        }
+        .toggle-link {
+            color: #0066cc;
+            cursor: pointer;
+            text-decoration: underline;
+            font-size: 14px;
+            margin-top: 16px;
+            display: inline-block;
+        }
+        .hidden {
+            display: none;
+        }
+        .error-msg {
+            color: #dc3545;
+            font-size: 14px;
+            margin-top: 10px;
+            display: none;
+        }
+        .success-msg {
+            color: #28a745;
+            font-size: 14px;
+            margin-top: 10px;
+            display: none;
+        }
+        @media (max-width: 480px) {
+            .container { padding: 24px; }
+            .admin-row { flex-direction: column; }
+            .admin-row input, .admin-row select { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Logo -->
+        <div class="logo">Track<span>Pro</span></div>
+        <div class="subtitle">Real-time package tracking for your shipments</div>
+
+        <!-- Tracking Form -->
+        <div class="field-group">
+            <label for="trackingInput">Enter Tracking Number</label>
+            <input type="text" id="trackingInput" placeholder="e.g., TRK-123456789" autofocus>
+        </div>
+        <button class="btn" id="trackBtn">Track Package</button>
+        <button class="btn btn-secondary" id="adminToggle">🔐 Admin Login</button>
+
+        <!-- Result -->
+        <div class="result-box" id="resultBox">
+            <h3 id="resultTitle">Package Status</h3>
+            <p id="resultDesc">Loading details...</p>
+            <span class="status-badge" id="resultBadge">In Transit</span>
+        </div>
+
+        <!-- Error / Success -->
+        <div class="error-msg" id="errorMsg">⚠️ Tracking number not found.</div>
+        <div class="success-msg" id="successMsg">✅ Status updated successfully!</div>
+
+        <!-- Admin Panel -->
+        <div class="admin-panel" id="adminPanel">
+            <h3>📊 Admin Dashboard</h3>
+            <p style="color:#666;font-size:13px;margin-bottom:14px;">Add or update tracking entries</p>
+            
+            <div class="admin-row">
+                <input type="text" id="newTrackingId" placeholder="TRK-XXXXXXXXX">
+                <input type="text" id="newDescription" placeholder="Description">
+                <select id="newStatus">
+                    <option value="pending">Pending</option>
+                    <option value="in-transit" selected>In Transit</option>
+                    <option value="delivered">Delivered</option>
+                </select>
+                <button class="btn-small" id="addTrackingBtn">➕ Add</button>
+            </div>
+
+            <div class="tracking-list" id="trackingList">
+                <p style="color:#999;font-size:13px;">No tracking entries yet. Add one above.</p>
+            </div>
+
+            <button class="btn-small" id="refreshList" style="margin-top:10px;background:#6c757d;">🔄 Refresh List</button>
+            <button class="btn-small" id="logoutAdmin" style="margin-top:10px;background:#dc3545;float:right;">🚪 Logout</button>
+        </div>
+    </div>
+
+    <script>
+        // ===== DATABASE (localStorage) =====
+        function getTrackings() {
+            try {
+                return JSON.parse(localStorage.getItem('trackPro_data')) || [];
+            } catch { return []; }
+        }
+
+        function saveTrackings(data) {
+            localStorage.setItem('trackPro_data', JSON.stringify(data));
+        }
+
+        // ===== SAMPLE DATA =====
+        if (getTrackings().length === 0) {
+            saveTrackings([
+                { id: 'TRK-123456789', description: 'Smartphone - iPhone 15', status: 'in-transit', date: '2026-08-09' },
+                { id: 'TRK-987654321', description: 'Laptop - Dell XPS', status: 'delivered', date: '2026-08-07' },
+                { id: 'TRK-555555555', description: 'Headphones - Sony WH-1000XM5', status: 'pending', date: '2026-08-10' }
+            ]);
+        }
+
+        // ===== DOM REFS =====
+        const trackingInput = document.getElementById('trackingInput');
+        const trackBtn = document.getElementById('trackBtn');
+        const resultBox = document.getElementById('resultBox');
+        const resultTitle = document.getElementById('resultTitle');
+        const resultDesc = document.getElementById('resultDesc');
+        const resultBadge = document.getElementById('resultBadge');
+        const errorMsg = document.getElementById('errorMsg');
+        const successMsg = document.getElementById('successMsg');
+        const adminPanel = document.getElementById('adminPanel');
+        const adminToggle = document.getElementById('adminToggle');
+        const trackingList = document.getElementById('trackingList');
+        const addTrackingBtn = document.getElementById('addTrackingBtn');
+        const newTrackingId = document.getElementById('newTrackingId');
+        const newDescription = document.getElementById('newDescription');
+        const newStatus = document.getElementById('newStatus');
+        const refreshList = document.getElementById('refreshList');
+        const logoutAdmin = document.getElementById('logoutAdmin');
+
+        let isAdmin = false;
+
+        // ===== TRACK FUNCTION =====
+        function trackPackage(id) {
+            const data = getTrackings();
+            const found = data.find(item => item.id.toUpperCase() === id.toUpperCase());
+
+            if (!found) {
+                errorMsg.style.display = 'block';
+                resultBox.style.display = 'none';
+                return;
+            }
+
+            errorMsg.style.display = 'none';
+            resultBox.style.display = 'block';
+            resultTitle.textContent = `📦 ${found.id}`;
+            resultDesc.textContent = found.description + ` — Last updated: ${found.date || 'N/A'}`;
+
+            const statusMap = {
+                'pending': { text: '⏳ Pending', class: 'status-pending' },
+                'in-transit': { text: '🚚 In Transit', class: 'status-in-transit' },
+                'delivered': { text: '✅ Delivered', class: 'status-delivered' }
+            };
+            const status = statusMap[found.status] || statusMap['pending'];
+            resultBadge.textContent = status.text;
+            resultBadge.className = 'status-badge ' + status.class;
+        }
+
+        // ===== RENDER ADMIN LIST =====
+        function renderAdminList() {
+            const data = getTrackings();
+            if (data.length === 0) {
+                trackingList.innerHTML = '<p style="color:#999;font-size:13px;">No tracking entries.</p>';
+                return;
+            }
+            let html = '';
+            data.forEach((item, index) => {
+                const statusMap = {
+                    'pending': '⏳ Pending',
+                    'in-transit': '🚚 In Transit',
+                    'delivered': '✅ Delivered'
+                };
+                html += `
+                    <div class="tracking-item">
+                        <span class="id">${item.id}</span>
+                        <span style="flex:1;margin-left:12px;font-size:13px;color:#555;">${item.description}</span>
+                        <span class="status-text">${statusMap[item.status] || item.status}</span>
+                        <button class="btn-small btn-danger" style="margin-left:8px;padding:4px 10px;font-size:12px;" data-index="${index}">✕</button>
+                    </div>
+                `;
+            });
+            trackingList.innerHTML = html;
+
+            // Delete buttons
+            document.querySelectorAll('[data-index]').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const idx = parseInt(this.dataset.index);
+                    const data2 = getTrackings();
+                    data2.splice(idx, 1);
+                    saveTrackings(data2);
+                    renderAdminList();
+                    showSuccess('Entry deleted.');
+                });
+            });
+        }
+
+        function showSuccess(msg) {
+            successMsg.textContent = '✅ ' + msg;
+            successMsg.style.display = 'block';
+            setTimeout(() => { successMsg.style.display = 'none'; }, 2500);
+        }
+
+        // ===== EVENTS =====
+        trackBtn.addEventListener('click', function() {
+            const id = trackingInput.value.trim();
+            if (!id) {
+                errorMsg.textContent = '⚠️ Please enter a tracking number.';
+                errorMsg.style.display = 'block';
+                resultBox.style.display = 'none';
+                return;
+            }
+            trackPackage(id);
+        });
+
+        trackingInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') trackBtn.click();
+        });
+
+        // Admin toggle
+        adminToggle.addEventListener('click', function() {
+            if (!isAdmin) {
+                const pass = prompt('Enter admin password:');
+                if (pass === 'admin123') {
+                    isAdmin = true;
+                    adminPanel.style.display = 'block';
+                    renderAdminList();
+                    adminToggle.textContent = '🔒 Close Admin';
+                } else if (pass !== null) {
+                    alert('Incorrect password.');
+                }
+            } else {
+                isAdmin = false;
+                adminPanel.style.display = 'none';
+                adminToggle.textContent = '🔐 Admin Login';
+            }
+        });
+
+        // Add tracking
+        addTrackingBtn.addEventListener('click', function() {
+            const id = newTrackingId.value.trim().toUpperCase();
+            const desc = newDescription.value.trim();
+            const status = newStatus.value;
+
+            if (!id || !desc) {
+                alert('Please fill in both ID and description.');
+                return;
+            }
+
+            const data = getTrackings();
+            // Check duplicate
+            if (data.some(item => item.id.toUpperCase() === id)) {
+                alert('Tracking ID already exists!');
+                return;
+            }
+
+            data.push({
+                id: id,
+                description: desc,
+                status: status,
+                date: new Date().toISOString().split('T')[0]
+            });
+            saveTrackings(data);
+            newTrackingId.value = '';
+            newDescription.value = '';
+            renderAdminList();
+            showSuccess('Tracking entry added!');
+        });
+
+        // Refresh list
+        refreshList.addEventListener('click', function() {
+            renderAdminList();
+            showSuccess('List refreshed.');
+        });
+
+        // Logout
+        logoutAdmin.addEventListener('click', function() {
+            isAdmin = false;
+            adminPanel.style.display = 'none';
+            adminToggle.textContent = '🔐 Admin Login';
+            showSuccess('Logged out.');
+        });
+
+        // ===== INIT =====
+        console.log('TrackPro system ready. Admin password: admin123');
+    </script>
+</body>
+</html>
